@@ -49,6 +49,10 @@ class IrModuleToJsTransformer(private val backendContext: JsIrBackendContext) : 
         statements += postDeclarationBlock
         statements += context.staticContext.initializerBlock
 
+        if (backendContext.hasTests) {
+            statements += backendContext.testContainer.body.accept(IrElementToJsStatementTransformer(), context)
+        }
+
         return statements
     }
 
