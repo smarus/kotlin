@@ -18,11 +18,11 @@ package org.jetbrains.kotlin.ir.expressions.impl
 
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrReturnableBlock
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.symbols.IrFileSymbol
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrReturnableBlockSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrReturnableBlockSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -65,7 +65,7 @@ fun IrBlockImpl.inlineStatement(statement: IrStatement) {
     }
 }
 
-class IrReturnableBlockImpl(
+open class IrReturnableBlockImpl(
     startOffset: Int,
     endOffset: Int,
     type: IrType,
@@ -130,3 +130,13 @@ class IrReturnableBlockImpl(
         }
     }
 }
+
+class IrInlineFunctionBodyImpl(
+                           startOffset: Int,
+                           endOffset: Int,
+                           type: IrType,
+                           symbol: IrReturnableBlockSymbol,
+                           origin: IrStatementOrigin?,
+                           statements: List<IrStatement>,
+                           sourceFileSymbol: IrFileSymbol?,
+                           val inlineFunctionSymbol: IrFunctionSymbol): IrReturnableBlockImpl(startOffset, endOffset, type, symbol, origin, statements, sourceFileSymbol)
