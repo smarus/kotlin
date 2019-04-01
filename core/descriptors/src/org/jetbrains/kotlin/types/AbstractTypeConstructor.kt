@@ -16,13 +16,11 @@
 
 package org.jetbrains.kotlin.types
 
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.SupertypeLoopChecker
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 abstract class AbstractTypeConstructor(private val storageManager: StorageManager) : TypeConstructor {
     override fun getSupertypes() = supertypes().supertypesWithoutCycles
@@ -122,5 +120,4 @@ abstract class AbstractTypeConstructor(private val storageManager: StorageManage
 
 private fun KotlinType.isExpectClass() = constructor.isExpectClass()
 
-internal fun TypeConstructor.isExpectClass() =
-    declarationDescriptor?.safeAs<ClassDescriptor>()?.isExpect == true
+internal fun TypeConstructor.isExpectClass() = true
