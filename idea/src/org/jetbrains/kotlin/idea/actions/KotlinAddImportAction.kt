@@ -39,12 +39,15 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.KotlinDescriptorIconProvider
+import org.jetbrains.kotlin.idea.analysis.analyzeAsReplacement
+import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde
 import org.jetbrains.kotlin.idea.core.ImportableFqNameClassifier
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference
 import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.idea.references.resolveMainReferenceToDescriptors
 import org.jetbrains.kotlin.idea.util.ImportInsertHelper
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.name.FqName
@@ -52,6 +55,7 @@ import org.jetbrains.kotlin.name.parentOrNull
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
+import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 internal fun createSingleImportAction(
     project: Project,
@@ -195,7 +199,8 @@ class KotlinAddImportAction internal constructor(
     }
 
     private fun addImport(variant: AutoImportVariant) {
-        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val psiDocumentManager = PsiDocumentManager.getInstance(project)
+        psiDocumentManager.commitAllDocuments()
 
         project.executeWriteCommand(QuickFixBundle.message("add.import")) {
             if (!element.isValid) return@executeWriteCommand
@@ -207,19 +212,29 @@ class KotlinAddImportAction internal constructor(
                 StatisticsManager.getInstance().incUseCount(PsiProximityComparator.STATISTICS_KEY, it, location)
             }
 
-            for (descriptor in variant.descriptorsToImport) {
+            variant.descriptorsToImport.forEach { descriptor ->
                 // for class or package we use ShortenReferences because we not necessary insert an import but may want to
                 // insert partly qualified name
-                if (descriptor is ClassDescriptor || descriptor is PackageViewDescriptor) {
+
+                val importAlias = descriptor.importableFqName?.let { file.findAliasByFqName(it) }
+                if (importAlias != null || descriptor is ClassDescriptor || descriptor is PackageViewDescriptor) {
                     if (element is KtSimpleNameExpression) {
-                        element.mainReference.bindToFqName(
-                            descriptor.importableFqName!!,
-                            KtSimpleNameReference.ShorteningMode.FORCED_SHORTENING
-                        )
+                        if (importAlias != null) {
+                            importAlias.nameIdentifier?.copy()?.let { element.getIdentifier()?.replace(it) }
+                            val resultDescriptor = element.resolveMainReferenceToDescriptors().firstOrNull()
+                            if (resultDescriptor == descriptor) {
+                                return@forEach
+                            }
+                        }
+
+                        descriptor.importableFqName?.let {
+                            element.mainReference.bindToFqName(
+                                it,
+                                KtSimpleNameReference.ShorteningMode.FORCED_SHORTENING
+                            )
+                        }
                     }
-                } else {
-                    ImportInsertHelper.getInstance(project).importDescriptor(file, descriptor)
-                }
+                } else ImportInsertHelper.getInstance(project).importDescriptor(file, descriptor)
             }
         }
     }
