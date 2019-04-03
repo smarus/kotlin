@@ -51,6 +51,17 @@ class AccessorForConstructorDescriptor(
         throw UnsupportedOperationException()
     }
 
+    override fun copy(
+        newOwner: DeclarationDescriptor,
+        newOriginal: ClassConstructorDescriptor?,
+        modality: Modality,
+        visibility: Visibility,
+        kind: CallableMemberDescriptor.Kind,
+        copyOverrides: Boolean
+    ): ClassConstructorDescriptor {
+        throw UnsupportedOperationException()
+    }
+
     override fun getOriginal(): AccessorForConstructorDescriptor = this
 
     init {

@@ -463,7 +463,18 @@ open class WrappedClassConstructorDescriptor(
         kind: CallableMemberDescriptor.Kind,
         copyOverrides: Boolean
     ): ClassConstructorDescriptor {
-        TODO("not implemented")
+        throw UnsupportedOperationException()
+    }
+
+    override fun copy(
+        newOwner: DeclarationDescriptor,
+        newOriginal: ClassConstructorDescriptor?,
+        modality: Modality,
+        visibility: Visibility,
+        kind: CallableMemberDescriptor.Kind,
+        copyOverrides: Boolean
+    ): ClassConstructorDescriptor {
+        throw UnsupportedOperationException()
     }
 
     override fun getModality() = Modality.FINAL

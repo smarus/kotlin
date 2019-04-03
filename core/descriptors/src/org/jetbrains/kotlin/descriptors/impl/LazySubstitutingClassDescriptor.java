@@ -136,7 +136,12 @@ public class LazySubstitutingClassDescriptor implements ClassDescriptor {
         Collection<ClassConstructorDescriptor> result = new ArrayList<ClassConstructorDescriptor>(originalConstructors.size());
         for (ClassConstructorDescriptor constructor : originalConstructors) {
             ClassConstructorDescriptor copy =
-                    constructor.copy(this, constructor.getModality(), constructor.getVisibility(), constructor.getKind(), false);
+                    constructor.copy(
+                            this,
+                            constructor.getOriginal(),
+                            constructor.getModality(), constructor.getVisibility(),
+                            constructor.getKind(), false
+                    );
             result.add(copy.substitute(getSubstitutor()));
         }
         return result;

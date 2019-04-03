@@ -27,10 +27,19 @@ interface ClassConstructorDescriptor : ConstructorDescriptor {
     override fun substitute(substitutor: TypeSubstitutor): ClassConstructorDescriptor?
 
     override fun copy(
-            newOwner: DeclarationDescriptor,
-            modality: Modality,
-            visibility: Visibility,
-            kind: CallableMemberDescriptor.Kind,
-            copyOverrides: Boolean
+        newOwner: DeclarationDescriptor,
+        modality: Modality,
+        visibility: Visibility,
+        kind: CallableMemberDescriptor.Kind,
+        copyOverrides: Boolean
+    ): ClassConstructorDescriptor
+
+    fun copy(
+        newOwner: DeclarationDescriptor,
+        newOriginal: ClassConstructorDescriptor?,
+        modality: Modality,
+        visibility: Visibility,
+        kind: CallableMemberDescriptor.Kind,
+        copyOverrides: Boolean
     ): ClassConstructorDescriptor
 }

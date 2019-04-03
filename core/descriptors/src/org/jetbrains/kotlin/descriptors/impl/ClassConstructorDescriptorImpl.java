@@ -181,4 +181,24 @@ public class ClassConstructorDescriptorImpl extends FunctionDescriptorImpl imple
     ) {
         return (ClassConstructorDescriptor) super.copy(newOwner, modality, visibility, kind, copyOverrides);
     }
+
+    @NotNull
+    @Override
+    public ClassConstructorDescriptor copy(
+            @NotNull DeclarationDescriptor newOwner,
+            @Nullable ClassConstructorDescriptor newOriginal,
+            @NotNull Modality modality,
+            @NotNull Visibility visibility,
+            @NotNull Kind kind,
+            boolean copyOverrides
+    ) {
+        return (ClassConstructorDescriptor) newCopyBuilder()
+                .setOwner(newOwner)
+                .setOriginal(newOriginal)
+                .setModality(modality)
+                .setVisibility(visibility)
+                .setKind(kind)
+                .setCopyOverrides(copyOverrides)
+                .build();
+    }
 }
